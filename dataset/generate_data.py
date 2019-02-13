@@ -16,9 +16,9 @@ def generateTenDigitList():
     # print(List)
     return List
 
-def generateDataset(size):
+def generateDataset2(size):
     '''
-        Generate data to output file
+        Generate data into 2 file, inputfile.txt  and outputfile.txt
     '''
     infile = open('inputdata.txt', 'a')
     outfile = open('outputdata.txt', 'a')
@@ -35,7 +35,29 @@ def generateDataset(size):
         #print(Unsorted)
         #print(Sorted)
         #file.closed
+        infile.close()
+        outfile.close()
+
+def generateDataset(size):
+    '''
+        Generate data to output file
+    '''
+    with open("data.txt", "a") as file:
+        for i in range(size + 1):
+
+            Unsorted = generateTenDigitList() #unsorted generated list
+            Sorted = Unsorted.copy() #copy the unsorted
+            Sorted.sort() #sort the copy
+
+            file.write(str(Unsorted)) #write the list in file
+            # file.write("\n") 
+            file.write(" ; ") #delimited between sorted and unsorted
+            file.write(str(Sorted)) # write sorted to the file
+            file.write("\n") 
+            # print(Unsorted)
+            # print(Sorted)
+            # file.closed
 
 
-generateDataset(1000)
+generateDataset2(1000)
 
