@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "/home/th3rudite/anaconda3/bin/python", 
+    "python.linting.pylintArgs": [
+        "--errors-only",
+        "--generated-members=numpy.* ,torch.* ,cv2.* , cv.*"
+        ],
+        "python.linting.banditEnabled": false,
+        "python.linting.pylintEnabled": true,
+        "python.linting.enabled": true
+}
