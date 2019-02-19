@@ -16,7 +16,7 @@ def generateTenDigitList():
     # print(List)
     return List
 
-def generateDataset2(size):
+# def generateDataset2(size):
     '''
         Generate data into 2 file, inputfile.txt  and outputfile.txt
     '''

@@ -6,7 +6,7 @@ import torch.nn as nn #for torch neural networks
 
 Tensor_Input = []
 Tensor_Output = []
-N_EPOCHS = 1000
+N_EPOCHS = 100000
 DATASET_SIZE = 10
 
 with open('dataset/data.txt', 'r') as file:
