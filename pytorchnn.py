@@ -13,7 +13,7 @@ with open('dataset/data.txt', 'r') as file:
     counter = 0
     for line in file:
         
-        counter += 1 
+        counter += 1    
         if counter > DATASET_SIZE: break # determines how much data to train upon
 
         # lines below process the data
@@ -37,18 +37,18 @@ class Neural_Network(nn.Module):
         super(Neural_Network, self).__init__()
 
         # parameters
-        self.inputSize = 10 # 10 for list of ten unsorted digits
+        self.inputSize = 10 # 1000 for list of ten unsorted digits
         self.outputSize = 10 # 10 for a list of ten sorted digits
         self.hiddenSize = 10 # 10 for hidden layer of ten nodes
         
         # weights
-        self.W1 = torch.randn(self.inputSize, self.hiddenSize) # 10 X 10 tensor
+        self.W1 = torch.randn(self.inputSize, self.hiddenSize) # 1000 X 10 tensor
         self.W2 = torch.randn(self.hiddenSize, self.outputSize) # 10 X 10 tensor
         # print('W1 : ' + str(self.W1.size()))
         # print('W2 : ' + str(self.W2.size()))
         
     def forward(self, X):
-        self.z = torch.matmul(X, self.W1) # 10 X 10 matrix product
+        self.z = torch.matmul(X, self.W1) # 1000 X 10 matrix product
         self.z2 = self.sigmoid(self.z) # sigmoid activation function
         self.z3 = torch.matmul(self.z2, self.W2)
         o = self.sigmoid(self.z3) # final activation function
@@ -88,7 +88,7 @@ class Neural_Network(nn.Module):
             Predict data based on trained weights
         '''
         print ("Predicted data based on trained weights: ")
-        print ("Input : \n" + str(xPredicted))
+        print ("Input : \n" + str(xPredicted_unscaled))
         print ("Output: \n" + str(self.forward(xPredicted)))
 
 
@@ -98,17 +98,16 @@ y = torch.FloatTensor(Tensor_Output) # 1000 x 10
 print(X.size())
 print(y.size())
 
+xPredicted_unscaled = xPredicted = torch.tensor(([2, 0, 1, 9, 1, 2, 0, 7, 5, 2]), dtype=torch.float) # 1 X 10 tensor
 
-xPredicted = torch.tensor(([2, 0, 1, 9, 1, 2, 0, 7, 5, 2]), dtype=torch.float) # 1 X 10 tensor
+X_max, _ = torch.max(X, 0)
+xPredicted_max, _ = torch.max(xPredicted_unscaled, 0)
 
-# x_max, _ = torch.max(X, 0)
-# xPredicted_max, _ = torch.max(xPredicted, 0)
+X = torch.div(X, X_max)
+xPredicted = torch.div(xPredicted_unscaled, xPredicted_max)
+y = y / 100  # max test score is 100
 
-# x = torch.div(X, x_max)
-# xPredicted = torch.div(xPredicted, xPredicted_max)
-# y = y / 100  # max test score is 100
-
-print(y[0])
+# print(y[0])
 
 NN = Neural_Network()
 for i in range(N_EPOCHS):  # trains the NN 1,000 times
