@@ -6,7 +6,7 @@ import torch.nn as nn #for torch neural networks
 
 Tensor_Input = []
 Tensor_Output = []
-N_EPOCHS = 1000000
+N_EPOCHS = 100000
 DATASET_SIZE = 10
 
 with open('dataset/data.txt', 'r') as file:
@@ -42,13 +42,13 @@ class Neural_Network(nn.Module):
         self.hiddenSize = 10 # 10 for hidden layer of ten nodes
         
         # weights
-        self.W1 = torch.randn(self.inputSize, self.hiddenSize) # 10 X 10 tensor
+        self.W1 = torch.randn(self.inputSize, self.hiddenSize) # 1000 X 10 tensor
         self.W2 = torch.randn(self.hiddenSize, self.outputSize) # 10 X 10 tensor
         # print('W1 : ' + str(self.W1.size()))
         # print('W2 : ' + str(self.W2.size()))
         
     def forward(self, X):
-        self.z = torch.matmul(X, self.W1) # 10 X 10 matrix product
+        self.z = torch.matmul(X, self.W1) # 1000 X 10 matrix product
         self.z2 = self.sigmoid(self.z) # sigmoid activation function
         self.z3 = torch.matmul(self.z2, self.W2)
         o = self.sigmoid(self.z3) # final activation function
@@ -63,7 +63,6 @@ class Neural_Network(nn.Module):
     def backward(self, X, y, o):
         '''
             Back propagation
-            src: https://medium.com/dair-ai/a-simple-neural-network-from-scratch-with-pytorch-and-google-colab-c7f3830618e0
         '''
         self.o_error = y - o # error in output
         self.o_delta = self.o_error * self.sigmoidPrime(o) # derivative of sig to error
@@ -80,41 +79,36 @@ class Neural_Network(nn.Module):
         self.backward(X, y, o)
         
     def saveWeights(self, model):
-        torch.save(model, "NN") # PyTorch internal storage functions
+        torch.save(model, "NN") # we will use the PyTorch internal storage functions
         # torch.load("NN") # you can reload model with all the weights and so forth with:
         
-    def predict(self):
+    def predict(self,toPredict_unscaled, toPredict, target):
         '''
             Predict data based on trained weights
         '''
         print ("\nPredicted data based on trained weights: \n")
-        print ("Input : \n" + str(xPredicted_unscaled))
+        print ("Input : \n" + str(toPredict_unscaled))
         print ("Target: \n" + str(target))
-        print ("Output: \n" + str(torch.round(9 * self.forward(xPredicted))))
+        print ("Output: \n" + str(torch.round(9 * self.forward(toPredict))))
 
 
-X = torch.FloatTensor(Tensor_Input) # 1000000 x 10 
-y = torch.FloatTensor(Tensor_Output) # 1000000 x 10
+X = torch.FloatTensor(Tensor_Input) # 1000 x 10 
+y = torch.FloatTensor(Tensor_Output) # 1000 x 10
 
 print(X.size())
 print(y.size())
 
-# xPredicted_unscaled = xPredicted = X[2]
-testlist = [9, 3, 5, 1, 0, 5, 2, 7, 8, 1]
-targetlist = testlist.copy()
-targetlist.sort()
 
 
-xPredicted_unscaled = xPredicted = torch.FloatTensor(testlist)
-# print(targettestlist)
-target = torch.FloatTensor(targetlist)
+xPredicted_unscaled = xPredicted = X
+target = y
 
 X_max, _ = torch.max(X, 0)
 xPredicted_max, _ = torch.max(xPredicted_unscaled, 0)
 
 X = torch.div(X, X_max)
 xPredicted = torch.div(xPredicted_unscaled, xPredicted_max)
-y = y / 9  # max test score is 100
+y = y / 9  # max integer value is 9
 
 # print(y[0])
 
@@ -122,5 +116,9 @@ NN = Neural_Network()
 for i in range(N_EPOCHS):  # trains the NN 1,000 times
     print ("Epoch " + str(i) + " | Loss: " + str(torch.mean((y - NN(X))**2).detach().item()))  # mean sum squared loss
     NN.train(X, y)
+
 NN.saveWeights(NN)
-NN.predict()
+
+print("\n\nTest:\n")
+for i in range(10):
+    NN.predict(xPredicted_unscaled[i], xPredicted[i], target[i])
