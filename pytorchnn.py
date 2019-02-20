@@ -87,9 +87,10 @@ class Neural_Network(nn.Module):
         '''
             Predict data based on trained weights
         '''
-        print ("Predicted data based on trained weights: ")
+        print ("\nPredicted data based on trained weights: \n")
         print ("Input : \n" + str(xPredicted_unscaled))
-        print ("Output: \n" + str(self.forward(xPredicted)))
+        print ("Target: \n" + str(target))
+        print ("Output: \n" + str(torch.round(9 * self.forward(xPredicted))))
 
 
 X = torch.FloatTensor(Tensor_Input) # 1000 x 10 
@@ -98,14 +99,15 @@ y = torch.FloatTensor(Tensor_Output) # 1000 x 10
 print(X.size())
 print(y.size())
 
-xPredicted_unscaled = xPredicted = torch.tensor(([2, 0, 1, 9, 1, 2, 0, 7, 5, 2]), dtype=torch.float) # 1 X 10 tensor
+xPredicted_unscaled = xPredicted = X[2]
+target = y[2]
 
 X_max, _ = torch.max(X, 0)
 xPredicted_max, _ = torch.max(xPredicted_unscaled, 0)
 
 X = torch.div(X, X_max)
 xPredicted = torch.div(xPredicted_unscaled, xPredicted_max)
-y = y / 100  # max test score is 100
+y = y / 9  # max test score is 100
 
 # print(y[0])
 
