@@ -4,31 +4,34 @@ import torch #for torch tensors
 import torch.nn as nn #for torch neural networks
 
 
-Tensor_Input = []
-Tensor_Output = []
-N_EPOCHS = 1000000
-DATASET_SIZE = 10
+N_EPOCHS = 100000
+DATASET_SIZE = 100000
 
-with open('dataset/data.txt', 'r') as file:
-    counter = 0
-    for line in file:
-        
-        counter += 1    
-        if counter > DATASET_SIZE: break # determines how much data to train upon
+def readDataset(filepath):
+    Tensor_Input = []
+    Tensor_Output = []
+    with open(filepath, 'r') as file:
+        counter = 0
+        for line in file:
+            
+            counter += 1    
+            if counter > DATASET_SIZE: break # determines how much data to train upon
 
-        # lines below process the data
-        replaced = line.replace('[', '').replace(',', '').replace(' ', '').replace(']','').replace('\n', '')
-        split = replaced.split(';')
-        inputline = split[0]
-        outputline = split[1]
+            # lines below process the data
+            replaced = line.replace('[', '').replace(',', '').replace(' ', '').replace(']','').replace('\n', '')
+            split = replaced.split(';')
+            inputline = split[0]
+            outputline = split[1]
 
-        temp_input_array = []
-        for char in inputline: temp_input_array.append(int(char))
-        Tensor_Input.append(temp_input_array)
+            temp_input_array = []
+            for char in inputline: temp_input_array.append(int(char))
+            Tensor_Input.append(temp_input_array)
 
-        temp_output_array = []
-        for char in outputline: temp_output_array.append(int(char))
-        Tensor_Output.append(temp_output_array)
+            temp_output_array = []
+            for char in outputline: temp_output_array.append(int(char))
+            Tensor_Output.append(temp_output_array)
+    
+    return Tensor_Input, Tensor_Output
 
 
 
@@ -37,7 +40,7 @@ class Neural_Network(nn.Module):
         super(Neural_Network, self).__init__()
 
         # parameters
-        self.inputSize = 10 # 1000 for list of ten unsorted digits
+        self.inputSize = 10 # 10 for list of ten unsorted digits
         self.outputSize = 10 # 10 for a list of ten sorted digits
         self.hiddenSize = 10 # 10 for hidden layer of ten nodes
         
@@ -87,20 +90,26 @@ class Neural_Network(nn.Module):
         '''
             Predict data based on trained weights
         '''
+        # xPredicted = torch.FloatTensor(xPredicted)
         print ("\nPredicted data based on trained weights: \n")
         print ("Input : \n" + str(xPredicted_unscaled))
-        print ("Target: \n" + str(target))
+        print ("Target output: \n" + str(target))
+        # print ("Output: \n" + str(torch.round(9 * self.forward(xPredicted))))
         print ("Output: \n" + str(torch.round(9 * self.forward(xPredicted))))
+        print ("Output (unrounded): \n" + str(9 * self.forward(xPredicted)))
 
-
-X = torch.FloatTensor(Tensor_Input) # 1000000 x 10 
-y = torch.FloatTensor(Tensor_Output) # 1000000 x 10
+Tensor_Input, Tensor_Output = readDataset('./dataset/data.txt')
+X = torch.FloatTensor(Tensor_Input) # 100000 x 10 
+y = torch.FloatTensor(Tensor_Output) # 100000 x 10
 
 print(X.size())
+print ('x : ' + str(X))
 print(y.size())
+print('y : ' + str(y))
 
-# xPredicted_unscaled = xPredicted = X[2]
-testlist = [9, 3, 5, 1, 0, 5, 2, 7, 8, 1]
+# xPredicted_unscaled = xPredicted = X[2] 
+testlist = [9, 3, 5, 1, 0, 5, 2, 7, 8, 1] # test list to predict
+# testlist = [0, 0, 1, 3, 6, 5, 1, 9, 2, 2]
 targetlist = testlist.copy()
 targetlist.sort()
 
@@ -119,8 +128,11 @@ y = y / 9  # max test score is 100
 # print(y[0])
 
 NN = Neural_Network()
-for i in range(N_EPOCHS):  # trains the NN 1,000 times
-    print ("Epoch " + str(i) + " | Loss: " + str(torch.mean((y - NN(X))**2).detach().item()))  # mean sum squared loss
-    NN.train(X, y)
+for i in range(0, N_EPOCHS):  # trains the NN 1,000 times
+    print ("Epoch " + str(i) + " | Loss: " + \
+    str(torch.mean((y[i:10+i] - NN(X[i:10+i]))**2).detach().item()))  # mean sum squared loss
+    NN.train(X[i:10+i], y[i:10+i])
 NN.saveWeights(NN)
+
+
 NN.predict()
